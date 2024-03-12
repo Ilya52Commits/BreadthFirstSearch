@@ -3,70 +3,122 @@ using System.Collections.Generic;
 
 namespace GraphProject
 {
-  internal class Program
+  internal abstract class Program
   {
     // Создание и заполнение графа
-    private static Dictionary<string, string[]> graph = new Dictionary<string, string[]>();
+    private static Dictionary<string, string[]> AdjacencyList = new Dictionary<string, string[]>();
+    private static int[,] AdjacencyMatrix = new int[,] { };
 
     #region Реализация поиска в ширину
-    // Функция поиска в ширину (Breadth-First Search)
-    private static bool BFS(string name)
+    // Функция поиска в ширину для списка смежности
+    private static void BFSforAdjacencyList(string startVertex)
     {
       // Создание очереди поиска и списка посещенных узлов
-      Queue<(string, List<string>)> searchQueue = new Queue<(string, List<string>)>();
-      searchQueue.Enqueue((name, new List<string>()));
+      Queue<string> searchQueue = new Queue<string>();
+      searchQueue.Enqueue(startVertex);
       List<string> searched = new List<string>();
 
       while (searchQueue.Count > 0)
       {
-        // Извлечение текущего узла и его пути
-        var (person, path) = searchQueue.Dequeue();
-        if (!searched.Contains(person))
+        // Извлечение текущей вершины 
+        var extractedVertex = searchQueue.Dequeue();
+        if (!searched.Contains(extractedVertex))
         {
-          if (personIsSearched(person))
-          {
-            // Если узел является продавцом манго, выводим сообщение и кратчайший путь
-            Console.WriteLine(person + " is a mango seller");
-            Console.WriteLine("Shortest path: " + string.Join(" -> ", path));
-            return true;
-          }
-          else
-          {
-            foreach (var s in graph[person])
-            {
-              // Создание нового пути с добавлением текущего узла и добавление его в очередь
-              var newPath = new List<string>(path);
-              newPath.Add(person);
-              searchQueue.Enqueue((s, newPath));
-            }
+          // Вывод посещаемой вершины
+          Console.WriteLine($"Посещённая вершина: {extractedVertex}");
+          // Добавление соседей вершины
+          foreach (var s in AdjacencyList[extractedVertex])
+            // Создание нового пути с добавлением текущего узла и добавление его в очередь
+            searchQueue.Enqueue(s);
 
-            // Добавление текущего узла в список посещенных узлов
-            searched.Add(person);
+          // Добавление текущего узла в список посещенных узлов
+          searched.Add(extractedVertex);
+        }
+      }
+    }
+
+    private static void BFSforAdjacencyMatrix(int startVertex)
+    {
+      bool[] searched = new bool[] { }; 
+      Queue<int> searchQueue = new Queue<int>();
+
+      searchQueue.Enqueue(startVertex);
+      searched[startVertex] = true;
+
+      while(searchQueue.Count > 0)
+      {
+        var extractedVertex = searchQueue.Dequeue();
+        Console.WriteLine($"Посещённая вершина: {extractedVertex}");
+
+        for (int i = 0; i < AdjacencyMatrix.GetLength(0); i++)
+        {
+          if (AdjacencyMatrix[])
+        }
+      }
+    }
+    #endregion
+
+    public class Graph
+    {
+      private int[,] adjacencyMatrix;
+      private int numVertices;
+
+      public Graph(int[,] matrix)
+      {
+        adjacencyMatrix = matrix;
+        numVertices = matrix.GetLength(0);
+      }
+
+      public void BFS(int startVertex)
+      {
+        bool[] visited = new bool[numVertices];
+        Queue<int> queue = new Queue<int>();
+
+        visited[startVertex] = true;
+        queue.Enqueue(startVertex);
+
+        while (queue.Count > 0)
+        {
+          int currentVertex = queue.Dequeue();
+          Console.WriteLine("Посещена вершина: " + currentVertex);
+
+          for (int i = 0; i < numVertices; i++)
+          {
+            if (adjacencyMatrix[currentVertex, i] == 1 && !visited[i])
+            {
+              visited[i] = true;
+              queue.Enqueue(i);
+            }
           }
         }
       }
-
-      return false;
     }
-    // Функция для проверки, является ли имя ключевым
-    private static bool personIsSearched(string name) => name[name.Length - 1] == 'm';
-    #endregion
 
     public static void Main(string[] args)
     {
 
       // Добавление связей в граф
-      graph.Add("you", new string[] { "alice", "bob", "claire" });
-      graph.Add("bob", new string[] { "anuj", "peggy" });
-      graph.Add("alice", new string[] { "peggy" });
-      graph.Add("claire", new string[] { "thom", "jonny" });
-      graph.Add("anuj", new string[] { });
-      graph.Add("peggy", new string[] { });
-      graph.Add("thom", new string[] { });
-      graph.Add("jonny", new string[] { });
+      AdjacencyList.Add("you", new string[] { "alice", "bob", "claire" });
+      AdjacencyList.Add("bob", new string[] { "anuj", "peggy" });
+      AdjacencyList.Add("alice", new string[] { "peggy" });
+      AdjacencyList.Add("claire", new string[] { "thom", "jonny" });
+      AdjacencyList.Add("anuj", new string[] { });
+      AdjacencyList.Add("peggy", new string[] { });
+      AdjacencyList.Add("thom", new string[] { });
+      AdjacencyList.Add("jonny", new string[] { });
 
       // Вызов функции BFS с начальным узлом "you"
-      Console.WriteLine(BFS("you"));
+      BFSforAdjacencyList("you");
+      int[,] adjacencyMatrix = {
+            { 0, 1, 1, 0 },
+            { 1, 0, 0, 1 },
+            { 1, 0, 0, 0 },
+            { 0, 1, 0, 0 }
+        };
+      int startVertex = 0;
+
+      Graph graph1 = new Graph(adjacencyMatrix);
+      graph1.BFS(startVertex);
     }
   }
 }
